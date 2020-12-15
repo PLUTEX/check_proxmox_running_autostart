@@ -1,0 +1,16 @@
+image: alpine:latest
+
+stages:
+  - lint
+
+.lint:
+  stage: lint
+  script:
+    - lint > report.xml
+  artifacts:
+    reports:
+      junit: report.xml
+
+lint:flake8:
+  image: code.plutex.de:5001/plutex/docker-lint/flake8:latest
+  extends: .lint
