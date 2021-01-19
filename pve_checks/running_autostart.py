@@ -18,8 +18,8 @@ def check(pve: ProxmoxAPI = None):
                     code=ResultCode.WARNING,
                     summary='',  # unused at this stage
                     details='{} on {} is {} but autostart={}'.format(
-                        node['node'],
                         vm['name'],
+                        node['node'],
                         vm['status'],
                         onboot,
                     )
