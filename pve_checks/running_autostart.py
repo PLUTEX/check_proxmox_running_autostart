@@ -10,6 +10,10 @@ def check(pve: ProxmoxAPI = None):
         raise RuntimeError('pve parameter missing')
 
     for node in pve.nodes.get():
+        node_fqdn = '.'.join((
+            node['node'],
+            pve.nodes(node['node']).dns.get()['search']
+        ))
         for vm in pve.nodes(node['node']).qemu.get():
             vm_config = pve.nodes(node['node']).qemu(vm['vmid']).config.get()
             onboot = vm_config.get('onboot', 0)
@@ -19,7 +23,7 @@ def check(pve: ProxmoxAPI = None):
                     summary='',  # unused at this stage
                     details='{} on {} is {} but autostart={}'.format(
                         vm['name'],
-                        node['node'],
+                        node_fqdn,
                         vm['status'],
                         onboot,
                     )

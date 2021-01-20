@@ -19,6 +19,11 @@ def check(pve: ProxmoxAPI = None, age: int = 7) -> Iterable[NagiosResult]:
     for node in pve.nodes.get():
         last_failed = 0
         last_success = 0
+        node_fqdn = '.'.join((
+            node['node'],
+            pve.nodes(node['node']).dns.get()['search']
+        ))
+
         for task in pve.nodes(node['node']).tasks.get(typefilter='vzdump'):
             if task['endtime'] < cutoff:
                 continue
@@ -33,7 +38,7 @@ def check(pve: ProxmoxAPI = None, age: int = 7) -> Iterable[NagiosResult]:
                 ResultCode.CRITICAL,
                 '',  # unused at this stage
                 'Last backup of node {} at {} had errors'.format(
-                    node['node'],
+                    node_fqdn,
                     datetime.fromtimestamp(last_failed),
                 ),
             )
@@ -42,7 +47,7 @@ def check(pve: ProxmoxAPI = None, age: int = 7) -> Iterable[NagiosResult]:
                 ResultCode.WARNING,
                 '',  # unused at this stage
                 'Last backup of node {} older than cutoff'.format(
-                    node['node'],
+                    node_fqdn,
                 ),
             )
         else:
@@ -50,7 +55,7 @@ def check(pve: ProxmoxAPI = None, age: int = 7) -> Iterable[NagiosResult]:
                 ResultCode.OK,
                 '',  # unused at this stage
                 'Last backup of node {} at {} was successful'.format(
-                    node['node'],
+                    node_fqdn,
                     datetime.fromtimestamp(last_success),
                 ),
             )
