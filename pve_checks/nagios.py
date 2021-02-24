@@ -54,6 +54,9 @@ def merge_results(
     :returns: The merged NagiosResult
     """
     results = tuple(results)
+    if len(results) == 1:
+        return results[0]
+
     return NagiosResult(
         code=max((result.code for result in results), default=fallback_code),
         summary=summary or 'There are {} problems'.format(
